@@ -6,11 +6,11 @@ import java.util.UUID;
 
 import factionmod.config.ConfigGeneral;
 import factionmod.data.FactionModDatas;
-import factionmod.event.FactionLevelUpEvent;
+//import factionmod.event.FactionLevelUpEvent;
 import factionmod.event.GradeChangeEvent;
 import factionmod.event.RecruitLinkChangedEvent;
-import factionmod.handler.EventHandlerExperience;
-import factionmod.inventory.FactionInventory;
+//import factionmod.handler.EventHandlerExperience;
+//import factionmod.inventory.FactionInventory;
 import factionmod.utils.DimensionalBlockPos;
 import factionmod.utils.DimensionalPosition;
 import net.minecraft.nbt.NBTTagCompound;
@@ -31,33 +31,23 @@ public class Team implements INBTSerializable<NBTTagCompound> {
     private final ArrayList<Member>              members     = new ArrayList<>();
     private final ArrayList<UUID>                invitations = new ArrayList<>();
     private final ArrayList<DimensionalPosition> chunks      = new ArrayList<>();
-    private DimensionalBlockPos                  homePos     = null;
     private final ArrayList<Grade>               grades      = new ArrayList<>();
-    private FactionInventory                     inventory;
-
     private String  name;
-    private String  description;
-    private boolean opened      = false;
-    private int     level       = 1;
-    private int     exp         = 0;
-    private int     damages     = 0;
     private String  recruitLink = "";
 
-    public Faction(final String name, final String desc, final Member owner) {
+    public Team(final String name, final Member owner) {
         this.name = name;
-        this.description = desc;
-        this.inventory = new FactionInventory(name);
         this.members.add(owner);
     }
 
-    public Faction(final NBTTagCompound nbt) {
+    public Team(final NBTTagCompound nbt) {
         this.deserializeNBT(nbt);
     }
 
     /**
-     * Returns the link for the recruitement for the {@link Faction}.
+     * Returns the link for the recruitment for the {@link Team.
      *
-     * @return the link for the recruitement or an empty {@link String} if no link
+     * @return the link for the recruitment or an empty {@link String} if no link
      *         was set
      */
     public String getRecruitLink() {
@@ -77,14 +67,14 @@ public class Team implements INBTSerializable<NBTTagCompound> {
         this.recruitLink = event.getNewLink();
     }
 
-    /**
-     * Returns the inventory of the {@link Faction}
-     *
-     * @return the inventory
-     */
-    public FactionInventory getInventory() {
-        return this.inventory;
-    }
+//    /**
+//     * Returns the inventory of the {@link Faction}
+//     *
+//     * @return the inventory
+//     */
+//    public FactionInventory getInventory() {
+//        return this.inventory;
+//    }
 
     /**
      * Returns a list containing each {@link Grade} created by the faction.
@@ -95,51 +85,51 @@ public class Team implements INBTSerializable<NBTTagCompound> {
         return Collections.unmodifiableList(this.grades);
     }
 
-    /**
-     * Damages the faction.
-     *
-     * @param damage
-     *            The amount of damage
-     */
-    public void damageFaction(final int damage) {
-        if (damage <= 0)
-            return;
-        this.damages += damage;
-        if (damages > ConfigGeneral.getInt("max_faction_damages"))
-            damages = ConfigGeneral.getInt("max_faction_damages");
-        FactionModDatas.save();
-    }
+//    /**
+//     * Damages the faction.
+//     *
+//     * @param damage
+//     *            The amount of damage
+//     */
+//    public void damageFaction(final int damage) {
+//        if (damage <= 0)
+//            return;
+//        this.damages += damage;
+//        if (damages > ConfigGeneral.getInt("max_faction_damages"))
+//            damages = ConfigGeneral.getInt("max_faction_damages");
+//        FactionModDatas.save();
+//    }
 
-    /**
-     * Returns the damages of the faction.
-     *
-     * @return
-     */
-    public int getDamages() {
-        return this.damages;
-    }
-
-    /**
-     * Decreases the damages of the faction.
-     *
-     * @param count
-     *            The amount to decrease
-     */
-    public void decreaseDamages(final int count) {
-        this.damages -= count;
-        if (this.damages < 0)
-            this.damages = 0;
-        FactionModDatas.save();
-    }
-
-    /**
-     * Sets the damages to 0.
-     */
-    public void resetDamages() {
-        this.damages = 0;
-        FactionModDatas.save();
-    }
-
+//    /**
+//     * Returns the damages of the faction.
+//     *
+//     * @return
+//     */
+//    public int getDamages() {
+//        return this.damages;
+//    }
+//
+//    /**
+//     * Decreases the damages of the faction.
+//     *
+//     * @param count
+//     *            The amount to decrease
+//     */
+//    public void decreaseDamages(final int count) {
+//        this.damages -= count;
+//        if (this.damages < 0)
+//            this.damages = 0;
+//        FactionModDatas.save();
+//    }
+//
+//    /**
+//     * Sets the damages to 0.
+//     */
+//    public void resetDamages() {
+//        this.damages = 0;
+//        FactionModDatas.save();
+//    }
+//
     /**
      * Adds a grade to the faction.
      *
@@ -188,94 +178,94 @@ public class Team implements INBTSerializable<NBTTagCompound> {
         this.grades.remove(grade);
         FactionModDatas.save();
     }
-
-    /**
-     * Returns the description of the faction. If no description was set, will
-     * return an empty {@link String}.
-     *
-     * @return the description or an empty {@link String}
-     */
-    public String getDesc() {
-        return description;
-    }
-
-    /**
-     * Sets the current level of the faction. Then call
-     * {@link Faction#increaseExp(0)} to change the level if the maximum experience
-     * si reached.
-     *
-     * @param level
-     */
-    public void setLevel(final int level) {
-        this.level = level;
-        this.increaseExp(0, null);
-        FactionModDatas.save();
-    }
-
-    /**
-     * Returns the current level of the faction.
-     *
-     * @return the level of the faction
-     */
-    public int getLevel() {
-        return this.level;
-    }
-
-    /**
-     * Sets the current experience to the given amount. Then calls
-     * {@link Faction#increaseExp(0)} to change the level if the experience is too
-     * high.
-     *
-     * @param exp
-     *            The new amount of experience of the faction
-     */
-    public void setExp(final int exp) {
-        this.exp = exp;
-        this.increaseExp(0, null);
-        FactionModDatas.save();
-    }
-
-    /**
-     * Increase the experience from the given amount. If the experience needed to
-     * level up is reached, the level of the faction is increased and the experience
-     * is consumed, then {@link EventHandlerExperience#onLevelUp(Faction)} is fired.
-     * If the specified amount of experience is equals to or lower than 0, the
-     * fonction will do nothing.
-     *
-     * @param exp
-     *            The amount of experience to add
-     * @param member
-     *            The UUID of the member who made the faction win the experience
-     */
-    public void increaseExp(final int exp, final UUID member) {
-        if (exp < 0)
-            return;
-        if (member != null) {
-            final Member m = getMember(member);
-            if (m != null)
-                m.addExperience(exp);
-        }
-        this.exp += exp;
-        final int neededXp = Levels.getExpNeededForLevel(this.level + 1);
-        if (this.exp >= neededXp) {
-            this.level++;
-            MinecraftForge.EVENT_BUS.post(new FactionLevelUpEvent(this));
-            this.exp -= neededXp;
-            this.increaseExp(0, member);
-        }
-        FactionModDatas.save();
-    }
-
-    /**
-     * Returns the current experience of the faction. See
-     * {@link Levels#getExpNeededForLevel(int)} to know the experience needed to
-     * level up.
-     *
-     * @return The amount of experience
-     */
-    public int getExp() {
-        return this.exp;
-    }
+//
+//    /**
+//     * Returns the description of the faction. If no description was set, will
+//     * return an empty {@link String}.
+//     *
+//     * @return the description or an empty {@link String}
+//     */
+//    public String getDesc() {
+//        return description;
+//    }
+//
+//    /**
+//     * Sets the current level of the faction. Then call
+//     * {@link Faction#increaseExp(0)} to change the level if the maximum experience
+//     * si reached.
+//     *
+//     * @param level
+//     */
+//    public void setLevel(final int level) {
+//        this.level = level;
+//        this.increaseExp(0, null);
+//        FactionModDatas.save();
+//    }
+//
+//    /**
+//     * Returns the current level of the faction.
+//     *
+//     * @return the level of the faction
+//     */
+//    public int getLevel() {
+//        return this.level;
+//    }
+//
+//    /**
+//     * Sets the current experience to the given amount. Then calls
+//     * {@link Faction#increaseExp(0)} to change the level if the experience is too
+//     * high.
+//     *
+//     * @param exp
+//     *            The new amount of experience of the faction
+//     */
+//    public void setExp(final int exp) {
+//        this.exp = exp;
+//        this.increaseExp(0, null);
+//        FactionModDatas.save();
+//    }
+//
+//    /**
+//     * Increase the experience from the given amount. If the experience needed to
+//     * level up is reached, the level of the faction is increased and the experience
+//     * is consumed, then {@link EventHandlerExperience#onLevelUp(Faction)} is fired.
+//     * If the specified amount of experience is equals to or lower than 0, the
+//     * fonction will do nothing.
+//     *
+//     * @param exp
+//     *            The amount of experience to add
+//     * @param member
+//     *            The UUID of the member who made the faction win the experience
+//     */
+//    public void increaseExp(final int exp, final UUID member) {
+//        if (exp < 0)
+//            return;
+//        if (member != null) {
+//            final Member m = getMember(member);
+//            if (m != null)
+//                m.addExperience(exp);
+//        }
+//        this.exp += exp;
+//        final int neededXp = Levels.getExpNeededForLevel(this.level + 1);
+//        if (this.exp >= neededXp) {
+//            this.level++;
+//            MinecraftForge.EVENT_BUS.post(new FactionLevelUpEvent(this));
+//            this.exp -= neededXp;
+//            this.increaseExp(0, member);
+//        }
+//        FactionModDatas.save();
+//    }
+//
+//    /**
+//     * Returns the current experience of the faction. See
+//     * {@link Levels#getExpNeededForLevel(int)} to know the experience needed to
+//     * level up.
+//     *
+//     * @return The amount of experience
+//     */
+//    public int getExp() {
+//        return this.exp;
+//    }
 
     /**
      * Returns the owner of the faction.
@@ -337,38 +327,38 @@ public class Team implements INBTSerializable<NBTTagCompound> {
                 return m;
         return null;
     }
-
-    /**
-     * Changes the position of the home.
-     *
-     * @param pos
-     *            The position of the new home
-     */
-    public void setHome(final DimensionalBlockPos pos) {
-        this.homePos = pos;
-        FactionModDatas.save();
-    }
-
-    /**
-     * Returns the position of the home of the faction. It can return a null object
-     * if the home isn't set.
-     *
-     * @return the position of the home or null if it isn't set
-     */
-    public DimensionalBlockPos getHome() {
-        return this.homePos;
-    }
-
-    /**
-     * Changes the description of the faction.
-     *
-     * @param desc
-     *            The new decription
-     */
-    public void setDesc(final String desc) {
-        this.description = desc;
-        FactionModDatas.save();
-    }
+//
+//    /**
+//     * Changes the position of the home.
+//     *
+//     * @param pos
+//     *            The position of the new home
+//     */
+//    public void setHome(final DimensionalBlockPos pos) {
+//        this.homePos = pos;
+//        FactionModDatas.save();
+//    }
+//
+//    /**
+//     * Returns the position of the home of the faction. It can return a null object
+//     * if the home isn't set.
+//     *
+//     * @return the position of the home or null if it isn't set
+//     */
+//    public DimensionalBlockPos getHome() {
+//        return this.homePos;
+//    }
+//
+//    /**
+//     * Changes the description of the faction.
+//     *
+//     * @param desc
+//     *            The new decription
+//     */
+//    public void setDesc(final String desc) {
+//        this.description = desc;
+//        FactionModDatas.save();
+//    }
 
     /**
      * Returns the name of the faction, as written when created.
@@ -428,7 +418,7 @@ public class Team implements INBTSerializable<NBTTagCompound> {
     }
 
     /**
-     * Adds a member in the faction. This fonction call
+     * Adds a member in the faction. This function call
      * {@link Faction#addMember(Member)}, the instance of member which is created
      * has the {@link Grade} : {@link Grade#MEMBER}.
      *
@@ -478,25 +468,25 @@ public class Team implements INBTSerializable<NBTTagCompound> {
         return Collections.unmodifiableList(this.members);
     }
 
-    /**
-     * Sets the faction opened. When the faction is opened, anyone can join it
-     * without invitation.
-     *
-     * @param opened
-     */
-    public void setOpened(final boolean opened) {
-        this.opened = opened;
-        FactionModDatas.save();
-    }
-
-    /**
-     * Indicates if the faction is opened.
-     *
-     * @return true if the faction si opened
-     */
-    public boolean isOpened() {
-        return this.opened;
-    }
+//    /**
+//     * Sets the faction opened. When the faction is opened, anyone can join it
+//     * without invitation.
+//     *
+//     * @param opened
+//     */
+//    public void setOpened(final boolean opened) {
+//        this.opened = opened;
+//        FactionModDatas.save();
+//    }
+//
+//    /**
+//     * Indicates if the faction is opened.
+//     *
+//     * @return true if the faction si opened
+//     */
+//    public boolean isOpened() {
+//        return this.opened;
+//    }
 
     @Override
     public boolean equals(final Object obj) {
@@ -510,11 +500,7 @@ public class Team implements INBTSerializable<NBTTagCompound> {
     @Override
     public void deserializeNBT(final NBTTagCompound nbt) {
         this.name = nbt.getString("name");
-        this.description = nbt.getString("description");
-        this.opened = nbt.getBoolean("opened");
-        this.level = nbt.getInteger("level");
-        this.exp = nbt.getInteger("exp");
-        this.damages = nbt.getInteger("damages");
+
         this.recruitLink = nbt.getString("recruitLink");
 
         final NBTTagList gradesList = nbt.getTagList("grades", NBT.TAG_COMPOUND);
@@ -543,11 +529,6 @@ public class Team implements INBTSerializable<NBTTagCompound> {
     public NBTTagCompound serializeNBT() {
         final NBTTagCompound nbt = new NBTTagCompound();
         nbt.setString("name", this.name);
-        nbt.setString("description", this.description);
-        nbt.setBoolean("opened", this.opened);
-        nbt.setInteger("level", this.level);
-        nbt.setInteger("exp", this.exp);
-        nbt.setInteger("damages", this.damages);
         nbt.setString("recruitLink", this.recruitLink);
 
         final NBTTagList gradesList = new NBTTagList();
@@ -571,9 +552,6 @@ public class Team implements INBTSerializable<NBTTagCompound> {
         nbt.setTag("chunks", chunksList);
 
         nbt.setTag("inventory", this.inventory.serializeNBT());
-
-        if (this.homePos != null)
-            nbt.setTag("home", this.homePos.serializeNBT());
 
         return nbt;
     }

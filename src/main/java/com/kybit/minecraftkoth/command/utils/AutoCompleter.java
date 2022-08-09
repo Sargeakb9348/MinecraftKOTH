@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.kybit.minecraftkoth.team.Team;
 import factionmod.handler.EventHandlerFaction;
-import factionmod.utils.ServerUtils;
+import com.kybit.minecraftkoth.utils.ServerUtils;
 
 /**
  * This class provide an help to complete the commands.
@@ -23,7 +23,7 @@ public class AutoCompleter {
      * @return all the names which start with the specified chain of characters
      */
     public static ArrayList<String> completePlayer(final String playerName) {
-        final String[] usernames = ServerUtils.getServer().getPlayerProfileCache().getUsernames();
+        final String[] usernames = ServerUtils.getServer().getPlayerNames();
         final ArrayList<String> ret = new ArrayList<>();
         for (final String username : usernames)
             if (username.toLowerCase().startsWith(playerName.toLowerCase()))
