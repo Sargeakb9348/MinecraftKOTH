@@ -1,5 +1,6 @@
 package com.kybit.minecraftkoth.command.utils;
 
+import java.util.Optional;
 import java.util.UUID;
 import com.kybit.minecraftkoth.utils.ServerUtils;
 import com.mojang.authlib.GameProfile;
@@ -20,10 +21,12 @@ public class UUIDHelper {
      * @return the UUID of the player
      */
     public static UUID getUUIDOf(final String playerName) {
-        final GameProfile profile = ServerUtils.getServer().getPlayerProfileCache().getGameProfileForUsername(playerName);
-        if (profile != null)
-            return profile.getId();
-        return null;
+        final Optional<GameProfile> profile = ServerUtils.getServer().getProfileCache().get(playerName);
+        if (profile.isPresent()) {  //warning?
+            return profile.get().getId();
+        }else{
+            return null;
+        }
     }
 
     /**
@@ -34,10 +37,12 @@ public class UUIDHelper {
      * @return the name of the player
      */
     public static String getNameOf(final UUID uuid) {
-        final GameProfile profile = ServerUtils.getServer().getPlayerProfileCache().getProfileByUUID(uuid);
-        if (profile != null)
-            return profile.getName();
-        return null;
+        final Optional<GameProfile> profile = ServerUtils.getServer().getProfileCache().get(uuid);
+        if (profile.isPresent()) { //warning?
+            return profile.get().getName();
+        }else{
+            return null;
+        }
     }
 
 }

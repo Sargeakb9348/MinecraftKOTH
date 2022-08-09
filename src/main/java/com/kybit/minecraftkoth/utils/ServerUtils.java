@@ -2,10 +2,13 @@ package com.kybit.minecraftkoth.utils;
 
 import java.util.UUID;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+//import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.level.ServerPlayer;//was EntityPlayerMP
+//import net.minecraft.profiler.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
+//import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 /**
  * Contains usefull methods relatives to the {@link MinecraftServer}.
@@ -16,11 +19,11 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 public class ServerUtils {
 
     private static MinecraftServer server;
-    private static Profiler        profiler;
+    private static ProfilerFiller profiler;
 
     public static void init() {
-        server = FMLCommonHandler.instance().getMinecraftServerInstance();
-        profiler = server.profiler;
+        server = ServerLifecycleHooks.getCurrentServer();
+        profiler = server.getProfiler();
     }
 
     /**
@@ -39,8 +42,9 @@ public class ServerUtils {
      *            The UUID
      * @return the player
      */
-    public static EntityPlayerMP getPlayer(final UUID uuid) {
-        return getServer().getPlayerList().getPlayerByUUID(uuid);
+    public static ServerPlayer getPlayer(final UUID uuid) {
+
+        return getServer().getPlayerList().getPlayer(uuid);
     }
 
     /**
@@ -48,7 +52,7 @@ public class ServerUtils {
      *
      * @return the profiler
      */
-    public static Profiler getProfiler() {
+    public static ProfilerFiller getProfiler() {
         return profiler;
     }
 
