@@ -1,10 +1,14 @@
 package com.kybit.minecraftkoth.utils;
 
 
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.entity.Entity;
+//import net.minecraft.entity.Entity;
+import net.minecraft.nbt.CompoundTag;
+//import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.core.BlockPos;
+//import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+//import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.common.util.INBTSerializable;
 
 /**
@@ -13,12 +17,12 @@ import net.minecraftforge.common.util.INBTSerializable;
  * @author BrokenSwing
  *
  */
-public class DimensionalBlockPos implements INBTSerializable<NBTTagCompound> {
+public class DimensionalBlockPos implements INBTSerializable<CompoundTag> {
 
     private int      dimension;
-    private BlockPos pos;
+    private BlockPos pos; //BlockPos(Entity source) OR BlockPos(int x, int y, int z)
 
-    public DimensionalBlockPos(final NBTTagCompound nbt) {
+    public DimensionalBlockPos(final CompoundTag nbt) {
         this.deserializeNBT(nbt);
     }
 
@@ -74,23 +78,23 @@ public class DimensionalBlockPos implements INBTSerializable<NBTTagCompound> {
     }
 
     @Override
-    public NBTTagCompound serializeNBT() {
-        final NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setInteger("dimension", this.dimension);
-        nbt.setInteger("x", this.pos.getX());
-        nbt.setInteger("y", this.pos.getY());
-        nbt.setInteger("z", this.pos.getZ());
+    public CompoundTag serializeNBT() {//write NBT
+        final CompoundTag nbt = new CompoundTag();
+        nbt.putInt("dimension", this.dimension);
+        nbt.putInt("x", this.pos.getX());
+        nbt.putInt("y", this.pos.getY());
+        nbt.putInt("z", this.pos.getZ());
         return nbt;
     }
 
     @Override
-    public void deserializeNBT(final NBTTagCompound nbt) {
-        this.dimension = nbt.getInteger("dimension");
-        this.pos = new BlockPos(nbt.getInteger("x"), nbt.getInteger("y"), nbt.getInteger("z"));
+    public void deserializeNBT(final CompoundTag nbt) {//read NBT
+        this.dimension = nbt.getInt("dimension");
+        this.pos = new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z"));
     }
 
     public static DimensionalBlockPos from(final Entity entity) {
-        return new DimensionalBlockPos(entity.getEntityWorld().provider.getDimension(), entity.getPosition());
+        return new DimensionalBlockPos(entity.getEntityWorld().provider.getDimension(), entity.getPosition());//TODO: storing data through NBT seem unfeasable in newer versions of FML find workaround.
     }
 
 }
